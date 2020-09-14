@@ -4,7 +4,6 @@
  *  Last modified:     1/1/2019
  **************************************************************************** */
 
-import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
@@ -19,6 +18,9 @@ public class Percolation {
     // we store the status of the sites as a set of n*n elements
     private boolean[] status;
 
+    // Number of open sites
+    private int openSites;
+
     // The WeightedQuickUnionUF structure that stores our elements and connections
     private WeightedQuickUnionUF grid;
 
@@ -32,8 +34,11 @@ public class Percolation {
         size = n;
 
         // set the top and bottom elements
-        top = (n*n) + 1;
-        bottom = (n*n) + 2;
+        top = n*n;
+        bottom = (n*n) + 1;
+
+        // number of open sites is 0 when we start
+        openSites = 0;
 
         /* initialize the grid structure
          * The grid uses 2 more elements:
@@ -44,12 +49,15 @@ public class Percolation {
         grid = new WeightedQuickUnionUF((n * n) + 2);
 
         // set all statuses to blocked
-        status = new boolean[(n * n)+2];
-        for (int i = 0; i < (n * n)+2; i++) {
+        status = new boolean[n * n];
+        for (int i = 0; i < n * n; i++) {
             status[i] = false;
         }
+        // we need to set the virtual top and bottom elements to open to allow
+        // connections to them e.g. if an element in the bottom row is opened
         // set virtual top element (n*n)+1 to open
-        status[top] = true;
+        // status[top] = true;
+        // status[bottom] = true;
     }
 
     // checks if row or col provided is within range of the grid (0 < i <= n)
@@ -64,14 +72,6 @@ public class Percolation {
         return (row - 1) * size + (col - 1);
     }
 
-    /*
-     *
-     * Utility - delete in final version
-     */
-    public void spitout() {
-        // print some info on the class
-        StdOut.printf("Count: %d%n", grid.count());
-    }
 
     // opens the site (row, col) if it is not open already
     public void open(int row, int col) {
@@ -82,8 +82,9 @@ public class Percolation {
         // if element is already open, return and do nothing
         if (isOpen(row, col)) return;
 
-        // change status to open
+        // change status to open and increase the openSites count by 1
         status[rcToN(row, col)] = true;
+        openSites += 1;
 
         // connect the open element to any open elements
         // if in the first row, connect to the virtual top row
@@ -124,20 +125,21 @@ public class Percolation {
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
-        // we can check this by confirming if the r/c element is connected to the top element
-        if (grid.find(top) == grid.find(rcToN(row, col))) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    /*
-        // returns the number of open sites
-        public int numberOfOpenSites()
+        checkSize(row);
+        checkSize(col);
 
-        // does the system percolate?
-        public boolean percolates()
-    */
+        // we can check this by confirming if the r/c element is connected to the top element
+        return grid.find(top) == grid.find(rcToN(row, col));
+    }
+    // returns the number of open sites
+    public int numberOfOpenSites() {
+        return openSites;
+    }
+
+    // does the system percolate?
+    public boolean percolates() {
+        // percolation can be determined if the top and bottom elements are connected
+        return grid.find(top) == grid.find(bottom);
+    }
 
 }

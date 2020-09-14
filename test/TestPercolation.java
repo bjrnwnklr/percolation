@@ -4,6 +4,7 @@
  *  Last modified:     1/1/2019
  **************************************************************************** */
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -12,6 +13,7 @@ import static org.junit.Assert.assertThrows;
 /**
  * Unit test for simple App.
  */
+@SuppressFBWarnings("NAB_NEEDLESS_BOOLEAN_CONSTANT_CONVERSION")
 public class TestPercolation {
     /**
      * Rigorous Test.
@@ -48,6 +50,7 @@ public class TestPercolation {
     }
 
     // Test open
+    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("NAB_NEEDLESS_BOOLEAN_CONSTANT_CONVERSION")
     @Test
     public void testOpen() {
         int n = 10;
@@ -56,10 +59,11 @@ public class TestPercolation {
         int r = 5;
         int c = 5;
         // Test that (5, 5) is not open
-        assertEquals(p.isOpen(r, c), false);
+        assertEquals(false, p.isOpen(r, c));
         p.open(r, c);
         // Test that (5, 5) is now open
-        assertEquals(p.isOpen(r, c), true);
+        assertEquals(true, p.isOpen(r, c));
+
     }
 
     // Test that we can connect elements and that isFull works
@@ -71,21 +75,57 @@ public class TestPercolation {
         int r = 1;
         int c = 1;
         // Test that (1, 1) is not open
-        assertEquals(p.isOpen(r, c), false);
+        assertEquals(false, p.isOpen(r, c));
         p.open(r, c);
         // Test that (1, 1) is now open
-        assertEquals(p.isOpen(r, c), true);
+        assertEquals(true, p.isOpen(r, c));
         // Test that (1, 1) is now full (connected to top)
-        assertEquals(p.isFull(1, 1), true);
+        assertEquals(true, p.isFull(1, 1));
 
         r = 3;
         c = 3;
         // test that (3, 3) is not full
-        assertEquals(p.isOpen(r, c), false);
-        assertEquals(p.isFull(r, c), false);
+        assertEquals(false, p.isOpen(r, c));
+        assertEquals(false, p.isFull(r, c));
         p.open(r, c);
-        assertEquals(p.isOpen(r, c), true);
-        assertEquals(p.isFull(r, c), false);
+        assertEquals(true, p.isOpen(r, c));
+        assertEquals(false, p.isFull(r, c));
     }
 
+    // Test that numberOfOpenSites works correctly
+    @Test
+    public void testNumberOfOpenSites() {
+        int n = 10;
+        Percolation p = new Percolation(n);
+
+        int r = 1;
+        int c = 1;
+        // Test that number of open sites is 0
+        assertEquals(0, p.numberOfOpenSites());
+        p.open(r, c);
+        // Test that open sites increased to 1
+        assertEquals(1, p.numberOfOpenSites());
+        // open the same site again, count should not go up
+        p.open(r, c);
+        // should still be 1...
+        assertEquals(1, p.numberOfOpenSites());
+        // open another site and check that it's now 2
+        p.open(3, 4);
+        assertEquals(2, p.numberOfOpenSites());
+    }
+
+    // Test that percolate() works correctly
+    @Test
+    public void testPercolate() {
+        int n = 5;
+        Percolation p = new Percolation(n);
+
+        // fill in the first column
+        int c = 1;
+        for (int r = 1; r <= n; r++) p.open(r, c);
+        // Test that number of open sites is 5
+        assertEquals(5, p.numberOfOpenSites());
+        // System should now percolate
+        assertEquals(true, p.percolates());
+    }
 }
