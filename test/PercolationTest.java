@@ -1,23 +1,15 @@
+import org.junit.jupiter.api.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+
 /* *****************************************************************************
  *  Name:              Bjoern Winkler
  *  Coursera User ID:  123456
  *  Last modified:     1/1/2019
  **************************************************************************** */
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-
-/**
- * Unit test for simple App.
- */
-@SuppressFBWarnings("NAB_NEEDLESS_BOOLEAN_CONSTANT_CONVERSION")
-public class TestPercolation {
-    /**
-     * Rigorous Test.
-     */
+class PercolationTest {
 
     // Test if constructor with n = 0 throws exception
     @Test
@@ -26,9 +18,23 @@ public class TestPercolation {
         assertEquals("n must be > 0: 0", exception.getMessage());
     }
 
-    // Test if isOpen with row / column out of bounds throws exception
+
     @Test
-    public void testIsOpen() {
+    void open() {
+        int n = 10;
+        Percolation p = new Percolation(n);
+
+        int r = 5;
+        int c = 5;
+        // Test that (5, 5) is not open
+        assertEquals(false, p.isOpen(r, c));
+        p.open(r, c);
+        // Test that (5, 5) is now open
+        assertEquals(true, p.isOpen(r, c));
+    }
+
+    @Test
+    void isOpen() {
         int n = 10;
         Percolation p = new Percolation(n);
 
@@ -49,26 +55,8 @@ public class TestPercolation {
         assertEquals("Not within grid dimensions: " + (n + 5), exception4.getMessage());
     }
 
-    // Test open
-    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("NAB_NEEDLESS_BOOLEAN_CONSTANT_CONVERSION")
     @Test
-    public void testOpen() {
-        int n = 10;
-        Percolation p = new Percolation(n);
-
-        int r = 5;
-        int c = 5;
-        // Test that (5, 5) is not open
-        assertEquals(false, p.isOpen(r, c));
-        p.open(r, c);
-        // Test that (5, 5) is now open
-        assertEquals(true, p.isOpen(r, c));
-
-    }
-
-    // Test that we can connect elements and that isFull works
-    @Test
-    public void testIsFull() {
+    void isFull() {
         int n = 10;
         Percolation p = new Percolation(n);
 
@@ -92,9 +80,8 @@ public class TestPercolation {
         assertEquals(false, p.isFull(r, c));
     }
 
-    // Test that numberOfOpenSites works correctly
     @Test
-    public void testNumberOfOpenSites() {
+    void numberOfOpenSites() {
         int n = 10;
         Percolation p = new Percolation(n);
 
@@ -114,9 +101,8 @@ public class TestPercolation {
         assertEquals(2, p.numberOfOpenSites());
     }
 
-    // Test that percolate() works correctly
     @Test
-    public void testPercolate() {
+    void percolates() {
         int n = 5;
         Percolation p = new Percolation(n);
 
