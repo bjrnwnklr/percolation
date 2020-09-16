@@ -14,12 +14,16 @@ public class PercolationStats {
     // trial run
     private double[] results;
 
+    private int trials;
+
     // perform independent trials on an n-by-n grid
     public PercolationStats(int n, int trials) {
         // throw an exception if n <= 0
         if (n <= 0) throw new IllegalArgumentException("n must be > 0: " + n);
         // throw an exception if trials <= 0
         if (trials <= 0) throw new IllegalArgumentException("trials must be > 0: " + trials);
+
+        this.trials = trials;
 
         // initialize results to 0
         results = new double[trials];
@@ -48,8 +52,6 @@ public class PercolationStats {
             // open the site if not already open
             if (!p.isOpen(r, c)) p.open(r, c);
         }
-        StdOut.printf("Percolation after %d sites.%n", p.numberOfOpenSites());
-        StdOut.printf("Threshold: %f%n", (double)p.numberOfOpenSites() / (n*n));
         return (double)p.numberOfOpenSites() / (n*n);
     }
 
@@ -57,22 +59,23 @@ public class PercolationStats {
     public double mean() {
         return StdStats.mean(results);
     }
-/*
+
     // sample standard deviation of percolation threshold
     public double stddev() {
-
+        return StdStats.stddev(results);
     }
 
     // low endpoint of 95% confidence interval
     public double confidenceLo() {
-
+        double res = this.mean() - (1.96 * this.stddev()) / Math.sqrt(trials);
+        return res;
     }
 
     // high endpoint of 95% confidence interval
     public double confidenceHi() {
-
+        return this.mean() + (1.96 * this.stddev()) / Math.sqrt(trials);
     }
-*/
+
     public static void main(String[] args) {
         int n;
         int trials;
@@ -84,7 +87,9 @@ public class PercolationStats {
             PercolationStats ps = new PercolationStats(n, trials);
 
             // print the mean
-            StdOut.printf("mean = %f", ps.mean());
+            StdOut.printf("mean \t\t\t\t\t= %f%n", ps.mean());
+            StdOut.printf("stddev \t\t\t\t\t= %f%n", ps.stddev());
+            StdOut.printf("95%% confidence interval = [%f, %f]%n", ps.confidenceLo(), ps.confidenceHi());
         }
     }
 }
