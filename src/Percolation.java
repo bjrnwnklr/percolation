@@ -24,6 +24,9 @@ public class Percolation {
     // The WeightedQuickUnionUF structure that stores our elements and connections
     private WeightedQuickUnionUF grid;
 
+    // secondary WQUUF structure without bottom element - used to avoid backwash
+    private WeightedQuickUnionUF gridXBottom;
+
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
 
@@ -47,6 +50,7 @@ public class Percolation {
          *
          */
         grid = new WeightedQuickUnionUF((n * n) + 2);
+        gridXBottom = new WeightedQuickUnionUF((n * n) + 1);
 
         // set all statuses to blocked
         status = new boolean[n * n];
@@ -95,22 +99,37 @@ public class Percolation {
         if ((row - 1) == 0) {
             // first row, so connect to top element
             grid.union(rcToN(row, col), top);
+            gridXBottom.union(rcToN(row, col), top);
         }
         // connect top neighbor if neighbor is open
-        else if (isOpen(row - 1, col)) grid.union(rcToN(row, col), rcToN(row-1, col));
+        else if (isOpen(row - 1, col)) {
+            grid.union(rcToN(row, col), rcToN(row-1, col));
+            gridXBottom.union(rcToN(row, col), rcToN(row-1, col));
+        }
 
         // check bottom neighbor
         if ((row + 1) == (size + 1)) {
             // bottom row, connect to bottom element
+            // we do not use gridXBottom here - avoid connecting to virtual
+            // bottom element
             grid.union(rcToN(row, col), bottom);
         }
-        else if (isOpen(row + 1, col)) grid.union(rcToN(row, col), rcToN(row + 1, col));
+        else if (isOpen(row + 1, col)) {
+            grid.union(rcToN(row, col), rcToN(row + 1, col));
+            gridXBottom.union(rcToN(row, col), rcToN(row + 1, col));
+        }
 
         // check left neighbor
-        if (((col - 1) > 0) && (isOpen(row, col - 1))) grid.union(rcToN(row, col), rcToN(row, col -1));
+        if (((col - 1) > 0) && (isOpen(row, col - 1))) {
+            grid.union(rcToN(row, col), rcToN(row, col -1));
+            gridXBottom.union(rcToN(row, col), rcToN(row, col -1));
+        }
 
         // check right neighbor
-        if (((col + 1) <= size) && (isOpen(row, col + 1))) grid.union(rcToN(row, col), rcToN(row, col + 1));
+        if (((col + 1) <= size) && (isOpen(row, col + 1))) {
+            grid.union(rcToN(row, col), rcToN(row, col + 1));
+            gridXBottom.union(rcToN(row, col), rcToN(row, col + 1));
+        }
     }
 
 
@@ -129,7 +148,8 @@ public class Percolation {
         checkSize(col);
 
         // we can check this by confirming if the r/c element is connected to the top element
-        return grid.find(top) == grid.find(rcToN(row, col));
+        // Use gridXBottom here to avoid backwash!
+        return gridXBottom.find(top) == gridXBottom.find(rcToN(row, col));
     }
     // returns the number of open sites
     public int numberOfOpenSites() {

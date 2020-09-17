@@ -2,7 +2,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.*;
 
 /* *****************************************************************************
  *  Name:              Bjoern Winkler
@@ -112,6 +111,28 @@ class PercolationTest {
         // Test that number of open sites is 5
         assertEquals(5, p.numberOfOpenSites());
         // System should now percolate
+        assertEquals(true, p.percolates());
+    }
+
+    @Test
+    void backwash() {
+        int n = 5;
+        Percolation p = new Percolation(n);
+
+        // fill in the first column
+        int c = 1;
+        for (int r = 1; r <= n; r++) p.open(r, c);
+        // Test that number of open sites is 5
+        assertEquals(5, p.numberOfOpenSites());
+        // System should now percolate
+        assertEquals(true, p.percolates());
+        // now open another site in the bottom row.
+        // If backwashing, this site would  be shown as Full as connected
+        // to the bottom row.
+        p.open(n, 3);
+        assertEquals(true, p.isOpen(n, 3));
+        assertEquals(false, p.isFull(n, 3));
+        // system should still percolate
         assertEquals(true, p.percolates());
     }
 }
